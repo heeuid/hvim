@@ -2,7 +2,7 @@ local utils = vim.g.utils
 vim.api.nvim_create_autocmd('FileType', {
   pattern = { "c", "cpp" },
   callback = function()
-    local root_dir = utils.getroot()
+    local root_dir = utils.get_root()
     if utils.is_file(root_dir .. "/.linux") then
       utils.config_indent(8, "tab")
     else

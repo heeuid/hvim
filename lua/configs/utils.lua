@@ -9,7 +9,7 @@ end
 -- 1. lsp root
 -- 2. .git/
 -- 3. cwd
-utils.getroot = function()
+utils.get_root = function()
   local clients = vim.lsp.get_clients()
   for _, client in pairs(clients) do
     if client.config.root_dir then

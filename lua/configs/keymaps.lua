@@ -33,7 +33,7 @@ local common_mappings = {
 local neo_tree_mappings = {
   e = {
     function()
-      require('neo-tree.command').execute({ toggle = true, dir = vim.g.utils.getroot() })
+      require('neo-tree.command').execute({ toggle = true, dir = vim.g.utils.get_root() })
     end, "explorer: neo-tree (Root)"
   },
   E = {
