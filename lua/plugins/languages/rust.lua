@@ -5,15 +5,6 @@ vim.api.nvim_create_autocmd('FileType', {
     utils.config_indent(4, "tab")
   end
 })
+require("lspconfig").rust_analyzer.setup({})
 
-return {
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = function(_, opts)
-      if opts.ensure_installed == nil then
-        opts.ensure_installed = {}
-      end
-      vim.list_extend(opts.ensure_installed, { "rust", })
-    end
-  },
-}
+return {}

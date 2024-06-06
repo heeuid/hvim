@@ -12,5 +12,6 @@ vim.opt.autoindent = true
 vim.opt.smarttab = true
 vim.opt.wrap = false
 vim.opt.termguicolors = true
+vim.opt.cursorline = true
 
 vim.g.utils.config_indent(4, "tab")

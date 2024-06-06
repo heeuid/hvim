@@ -59,6 +59,7 @@ local buffer_mappings_leader = {
     r = { "<cmd>BufferLineCloseRight<cr>", "Delete Buffers to the Right" },
     l = { "<cmd>BufferLineCloseLeft<cr>", "Delete Buffers to the Left" },
     e = { "<cmd>Neotree buffers<cr>", "Explore buffers" },
+    b = { "<cmd>Telescope buffers<cr>", "Buffers" },
   },
 }
 
@@ -77,13 +78,13 @@ local file_or_find_mappings_leader = {
     b = { "<cmd>Telescope buffers<cr>", "Buffers" },
     f = {
       function()
-        telescope_builtin.find_files({ cwd = utils.get_root() }) 
+        telescope_builtin.find_files({ cwd = utils.get_root() })
       end,
       "Find Files (root)"
     },
     F = {
       function()
-        telescope_builtin.find_files({ cwd = vim.fn.getcwd() }) 
+        telescope_builtin.find_files({ cwd = vim.fn.getcwd() })
       end,
       "Find Files (cwd)"
     },
@@ -99,10 +100,12 @@ local file_or_find_mappings_leader = {
       end,
       "Grep Text (cwd)"
     },
+    k = { telescope_builtin.keymaps, "Find Keymap" },
+    l = { telescope_builtin.registers, "Find Registers" },
   },
   ["<leader>"] = {
     function()
-      telescope_builtin.find_files({ cwd = utils.get_root() }) 
+      telescope_builtin.find_files({ cwd = utils.get_root() })
     end,
     "Find Files (root)"
   },
@@ -114,17 +117,75 @@ local file_or_find_mappings_leader = {
   },
 }
 
+local lsp_mappings_leader = {
+  l = {
+    name = "lsp",
+    f = { vim.lsp.buf.format, "format" },
+    h = { vim.lsp.buf.hover, "hover" },
+    i = { "<cmd>LspInfo<cr>", "info" },
+    n = { function() vim.diagnostic.goto_next() end, "next diagnostic" },
+    p = { function() vim.diagnostic.goto_prev() end, "prev diagnostic" },
+    w = {
+      name = "workspace",
+      a = { vim.lsp.buf.add_workspace_folder, "add workspace" },
+      r = { vim.lsp.buf.remove_workspace_folder, "remobe workspace" },
+      l = { function() vim.print(vim.inspect(vim.lsp.buf.list_workspace_folders())) end, "list workspace" },
+    },
+    r = { vim.lsp.buf.rename, "rename symbol" },
+  },
+  M = { "<cmd>Mason<cr>", "mason" },
+}
+local lsp_mappings = {
+  ["gd"] = { vim.lsp.buf.definition, "goto definition" },
+  ["gD"] = { vim.lsp.buf.declaration, "goto declaration" },
+  ["gi"] = { vim.lsp.buf.implementation, "goto implementation" },
+  ["gr"] = { vim.lsp.buf.references, "goto references" },
+}
+
 wk.register(common_mappings, { mode = "n", prefix = "" })
 wk.register(buffer_mappings, { mode = "n", prefix = "" })
+wk.register(lsp_mappings, { mode = "n", prefix = "" })
+
+wk.register({ y = { "\"+y", "system yank" } }, { mode = "n", prefix = "<leader>" })
+wk.register({ p = { "\"+p", "system paste" } }, { mode = "n", prefix = "<leader>" })
 wk.register(neo_tree_mappings_leader, { mode = "n", prefix = "<leader>" })
 wk.register(code_minimap_mappings_leader, { mode = "n", prefix = "<leader>" })
 wk.register(buffer_mappings_leader, { mode = "n", prefix = "<leader>" })
 wk.register(file_or_find_mappings_leader, { mode = "n", prefix = "<leader>" })
+wk.register(lsp_mappings_leader, { mode = "n", prefix = "<leader>" })
+
 wk.register(neo_tree_mappings_leader, { mode = "n", prefix = "<localleader>" })
 
 local xmode_common_mappings = {
-  ["<"] = { "<gv", "keep indenting" },
-  [">"] = { ">gv", "keep indenting" },
+  ["<Space>"] = { '<cmd>lua require("which-key").show(" ", {mode = "v", auto = true})<cr>', "" },
+  ["<lt>"] = { "<gv", "keep indenting <" },
+  [">"] = { ">gv", "keep indenting >" },
+}
+
+local xmode_add_chars_mappings_leader = {
+  a = {
+    name = "add surrounded text",
+    a = {
+      function() utils.add_chars() end,
+      "Add text to both ends"
+    },
+    h = {
+      function() utils.add_chars('left') end,
+      "Add text to left end"
+    },
+    l = {
+      function() utils.add_chars('right') end,
+      "Add text to right end"
+    },
+    c = {
+      function() utils.add_chars('one-line') end,
+      "Add text to a left end, a right end"
+    }
+  }
 }
 
 wk.register(xmode_common_mappings, { mode = "x", prefix = "" })
+
+wk.register({ y = { "\"+y", "system yank" } }, { mode = "x", prefix = "<leader>" })
+wk.register({ p = { "\"+p", "system paste" } }, { mode = "x", prefix = "<leader>" })
+wk.register(xmode_add_chars_mappings_leader, { mode = "x", prefix = "<leader>" })

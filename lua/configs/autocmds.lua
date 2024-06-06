@@ -5,7 +5,7 @@ local function restore_cursor()
   end
 end
 
--- Autocommand to trigger the restore_cursor function
+-- Restore cursor position
 vim.api.nvim_create_autocmd('BufReadPost', {
   pattern = '*',
   callback = restore_cursor

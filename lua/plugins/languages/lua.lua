@@ -5,15 +5,23 @@ vim.api.nvim_create_autocmd('FileType', {
     utils.config_indent(2, "space")
   end
 })
+require("lspconfig").lua_ls.setup({
+  settings = {
+    Lua = {
+      runtime = {
+        version = 'LuaJIT',
+        path = vim.split(package.path, ';')
+      },
+      diagnostics = { globals = 'vim' },
+      workspace = {
+        library = vim.api.nvim_get_runtime_file("", true),
+        checkThirdParty = false,
+      },
+      hint = {
+        anable = true
+      }
+    },
+  }
+})
 
-return {
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = function(_, opts)
-      if opts.ensure_installed == nil then
-        opts.ensure_installed = {}
-      end
-      vim.list_extend(opts.ensure_installed, { "lua", })
-    end
-  },
-}
+return {}

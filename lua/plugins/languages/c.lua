@@ -10,15 +10,32 @@ vim.api.nvim_create_autocmd('FileType', {
     end
   end
 })
-
-return {
-  {
-    "nvim-treesitter/nvim-treesitter",
-    opts = function(_, opts)
-      if opts.ensure_installed == nil then
-        opts.ensure_installed = {}
-      end
-      vim.list_extend(opts.ensure_installed, { "c", "cpp", })
-    end
-  },
+local lspconfig = require('lspconfig')
+lspconfig.clangd.setup {
+  -- cmd = { "clangd" },
+  filetypes = { "c", "cpp", "objc", "objcpp", "cuda", },
+  root_dir = function(fname)
+    return lspconfig.util.root_pattern(
+          '.clangd',
+          '.clang-tidy',
+          '.clang-format',
+          'compile_commands.json',
+          'compile_flgas.txt',
+          'configure.ac',
+          '.git')(fname) or
+        lspconfig.util.path.dirname(fname)
+  end,
+  settings = {
+    clangd = {
+      InlayHints = {
+        Designators = true,
+        Enabled = true,
+        ParamterNames = true,
+        DeducedTypes = true,
+      },
+      fallbackFlags = { "-std=c++20" }
+    }
+  }
 }
+
+return {}

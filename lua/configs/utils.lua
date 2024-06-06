@@ -27,6 +27,25 @@ utils.get_root = function()
   return vim.fn.getcwd()
 end
 
+utils.get_root_by_pattern = function(pats)
+  if type(pats) ~= type({}) then
+    pats = { pats }
+  end
+
+  local path = vim.fn.expand('%:p:h')
+  while path ~= '/' do
+    for _, pat in pairs(pats) do
+      local item_path = path .. '/' .. pat
+      if vim.fn.filereadable(item_path) or
+        vim.fn.isdirectory(item_path) then
+        return path
+      end
+    end
+    path = vim.fn.fnamemodify(path, ':h')
+  end
+  return nil
+end
+
 -- Configure indentation
 -- set tabsize and select to expand or not
 -- spaces: number of tab size by space cnt
@@ -103,6 +122,71 @@ utils.is_directory = function(path)
   local result = file:read("*a")
   file:close()
   return result:match("directory") ~= nil
+end
+
+-- Add surrond strings (selected lines)
+utils.add_chars = function(dir)
+  local mode = vim.api.nvim_get_mode().mode
+  if mode ~= 'v' and mode ~= 'V' and mode ~= '\x16' then
+    vim.print("Only for visual mode; now is ...", mode)
+    return
+  end
+
+  -- input surrond strings
+  local prepend_text
+  local append_text
+  if not dir or dir == 'left' or dir == 'both' or dir == 'one-line' then
+    prepend_text = vim.fn.input('First string: ')
+  else
+    prepend_text = ''
+  end
+  if not dir or dir == 'right' or dir == 'both' or dir == 'one-line' then
+    append_text = vim.fn.input('Last string: ')
+  else
+    append_text = ''
+  end
+
+  -- get selected area information
+  vim.cmd([[execute "normal! \<ESC>"]])
+  local _, start_line, start_col, _ = unpack(vim.fn.getpos("'<"))
+  local _, end_line, end_col, _ = unpack(vim.fn.getpos("'>"))
+
+  -- get selected text
+  local lines = vim.api.nvim_buf_get_lines(0, start_line - 1, end_line, false)
+
+  if dir == 'one-line' then
+    if #lines == 1 then -- one line is selected
+      local temp = lines[1]:sub(end_col + 1)
+      lines[1] = lines[1]:sub(1, start_col - 1) .. prepend_text .. lines[1]:sub(start_col, end_col) .. append_text
+      if end_col ~= vim.v.maxcol then
+        lines[1] = lines[1] .. temp
+      end
+    else
+      -- more than one lines are selected, and add string to only first, last lines
+      lines[1] = lines[1]:sub(1, start_col - 1) .. prepend_text .. lines[1]:sub(start_col)
+      local temp = lines[#lines]:sub(end_col + 1)
+      lines[#lines] = lines[#lines]:sub(1, end_col) .. append_text
+      if end_col ~= vim.v.maxcol then
+        lines[#lines] = lines[#lines] .. temp
+      end
+    end
+  else
+    for i, line in ipairs(lines) do
+      if #line > 0 then -- non-empty line
+        local temp = line:sub(end_col + 1)
+        local new_line = line:sub(1, start_col - 1) ..
+            prepend_text .. line:sub(start_col, end_col) .. append_text
+        if end_col ~= vim.v.maxcol then
+          lines[i] = new_line .. temp
+        else
+          lines[i] = new_line
+        end
+      end
+    end
+  end
+
+  -- update text
+  vim.api.nvim_buf_set_lines(0, start_line - 1, end_line, false, lines)
 end
 
 -- Register interface of utils
