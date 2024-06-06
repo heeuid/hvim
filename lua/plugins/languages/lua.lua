@@ -18,7 +18,7 @@ require("lspconfig").lua_ls.setup({
         checkThirdParty = false,
       },
       hint = {
-        anable = true
+        enable = true
       }
     },
   }
