@@ -3,16 +3,21 @@ return {
   config = function()
     vim.opt.rtp:prepend(vim.fn.stdpath('data') .. '/site')
     require("nvim-treesitter.configs").setup({
+      build = ":TSUpdate",
+      version = false,
       ensure_installed = {
-        --"lua",
+        "lua", "luadoc", "luap",
         "c", "python", "rust",
-        "vim", "vimdoc", "query",
-        "markdown", "toml", "json", "yaml",
+        "bash", "vim", "vimdoc",
+        "query", "diff", "printf", "regex",
+        "html", "javascript",
+        "markdown", "markdown_inline",
+        "toml", "json", "jsonc", "jsdoc", "yaml", "xml",
       },
       sync_install = false,
       auto_install = true,
-      ignore_install = { "javascript" },
       parser_install_dir = vim.fn.stdpath('data') .. '/site',
+      indent = { enable = true },
       highlight = {
         enable = true,
         additional_vim_regex_highlighting = false,
@@ -24,6 +29,29 @@ return {
           end
         end,
       },
+      cmd = { "TSUpdateSync", "TSUpdate", "TSInstall" },
+      keys = {
+        { "<c-space>", desc = "Increment Selection" },
+        { "<bs>", desc = "Decrement Selection", mode = "x" },
+      },
+      incremental_selection = {
+        enable = true,
+        keymaps = {
+          init_selection = "<C-space>",
+          node_incremental = "<C-space>",
+          scope_incremental = false,
+          node_decremental = "<bs>",
+        },
+      },
+      textobjects = {
+        move = {
+          enable = true,
+          goto_next_start = { ["]f"] = "@function.outer", ["]c"] = "@class.outer" },
+          goto_next_end = { ["]F"] = "@function.outer", ["]C"] = "@class.outer" },
+          goto_previous_start = { ["[f"] = "@function.outer", ["[c"] = "@class.outer" },
+          goto_previous_end = { ["[F"] = "@function.outer", ["[C"] = "@class.outer" },
+        }
+      }
     })
   end
 }
