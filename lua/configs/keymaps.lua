@@ -19,6 +19,7 @@ end
 -- t(terminal; ':terminal')
 
 local common_mappings = {
+  U = { '<C-R>', 'Redo' },
 	j = { 'gj', 'move cursor down by display line' },
 	k = { 'gk', 'move cursor up by display line' },
   ['<C-l>'] = { '<C-w>l', 'move to right window' },
